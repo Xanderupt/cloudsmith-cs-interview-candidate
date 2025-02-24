@@ -79,6 +79,9 @@ jobs:
           CLOUDSMITH_API_KEY=${{ steps.jwt-token.outputs.jwt-token }}
           echo "Authenticating Cloudsmith CLI..."
           export CLOUDSMITH_API_KEY
+      - name: List directory contents
+        run: pwd
+        shell: bash
 
       - name: List directory contents
         run: ls -la /
