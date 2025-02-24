@@ -34,8 +34,8 @@ jobs:
       - name: Build package
         run: python -m build
 
-      - name: List directory contents
-        run: ls -la dist/
+      - name: Create directory
+        run: sudo mkdir test/
         shell: bash
       
       - name: Print absolute path of dist directory
