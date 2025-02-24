@@ -81,7 +81,7 @@ jobs:
           export CLOUDSMITH_API_KEY
 
       - name: List directory contents
-        run: ls -la dist/
+        run: ls -la /
         shell: bash
 
       - name: Push package to Cloudsmith
