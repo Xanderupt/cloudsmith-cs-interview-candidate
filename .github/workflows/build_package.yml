@@ -37,6 +37,12 @@ jobs:
       - name: Create directory
         run: sudo mkdir test/
         shell: bash
+    
+    
+      - name: Create directory
+        run: pwd
+        shell: bash
+    
       
       - name: Print absolute path of dist directory
 
