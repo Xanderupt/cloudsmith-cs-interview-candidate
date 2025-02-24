@@ -80,9 +80,9 @@ jobs:
           echo "Authenticating Cloudsmith CLI..."
           export CLOUDSMITH_API_KEY
 
-      #- name: List directory contents
-      #  run: ls -la dist/
-      #  shell: bash
+      - name: List directory contents
+        run: ls -la dist/
+        shell: bash
 
       - name: Push package to Cloudsmith
         run: |
