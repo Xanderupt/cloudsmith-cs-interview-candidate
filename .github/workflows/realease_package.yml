@@ -84,12 +84,12 @@ jobs:
         shell: bash
 
       - name: List directory contents
-        run: ls -la test/
+        run: ls -la dist/
         shell: bash
 
       - name: Push package to Cloudsmith
         run: |
-          if ! ls test/*.tar.gz 1> /dev/null 2>&1; then
+          if ! ls dist/*.tar.gz 1> /dev/null 2>&1; then
             echo "No package found to upload"
             exit 1
           fi
