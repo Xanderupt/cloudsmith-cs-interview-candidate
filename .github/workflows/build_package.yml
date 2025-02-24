@@ -41,7 +41,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: python-package
+          name: example-package
           path: dist/
           if-no-files-found: error
           retention-days: 5
