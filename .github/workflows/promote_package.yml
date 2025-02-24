@@ -1,14 +1,14 @@
 name: Promote Python Package
 
 on:
-  repository_dispatch:  # Changed trigger to repository_dispatch for webhook integration
+  repository_dispatch:
     types: [package_synchronized]
 
 env:
-  CLOUDSMITH_NAMESPACE: ${{ vars.CLOUDSMITH_NAMESPACE }}
-  CLOUDSMITH_STAGING_REPO: 'staging'  # Corrected repository names
-  CLOUDSMITH_PRODUCTION_REPO: 'production'  # Corrected repository names
-  CLOUDSMITH_SERVICE_SLUG: ${{ vars.CLOUDSMITH_SERVICE_SLUG }}
+  CLOUDSMITH_NAMESPACE: ${{ secrets.CLOUDSMITH_NAMESPACE }}
+  CLOUDSMITH_STAGING_REPO: 'staging'
+  CLOUDSMITH_PRODUCTION_REPO: 'production'
+  CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
   PACKAGE_NAME: 'example_package'
 
 permissions:
@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Install jq
-        run: sudo apt-get install -y jq  # Added step to install jq
+        run: sudo apt-get install -y jq
 
       - name: Install Cloudsmith CLI
         uses: cloudsmith-io/cloudsmith-cli-action@v1.0.1
@@ -30,13 +30,11 @@ jobs:
 
       - name: Get package identifier and promote
         run: |
-          # Query for packages tagged with ready-for-production
-          PACKAGE_QUERY="tag:ready-for-production"  # Updated PACKAGE_QUERY to use tag
+          PACKAGE_QUERY="tag:ready-for-production"
           echo "Searching for packages with query: $PACKAGE_QUERY"
           
           PACKAGE_DATA=$(cloudsmith list package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} -q "$PACKAGE_QUERY" -F json)
           
-          # Extract identifiers and promote each package
           IDENTIFIERS=$(echo "$PACKAGE_DATA" | jq -r '.data[].identifier_perm')
           
           if [ -z "$IDENTIFIERS" ]; then
