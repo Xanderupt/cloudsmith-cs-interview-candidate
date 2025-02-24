@@ -33,11 +33,15 @@ jobs:
 
       - name: Build package
         run: python -m build
-
+      
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: python-package
-          path: dist/
+          path: /
           if-no-files-found: error
           retention-days: 5
+      - name: List directory contents
+        run: ls -la /
+        shell: bash
+     
