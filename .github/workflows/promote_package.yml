@@ -1,7 +1,8 @@
 name: Promote Python Package
 
 on:
-  package_synchronized:
+  repository_dispatch:
+    types: [package_synchronized]
 
 env:
   CLOUDSMITH_NAMESPACE: ${{ secrets.CLOUDSMITH_NAMESPACE }}
