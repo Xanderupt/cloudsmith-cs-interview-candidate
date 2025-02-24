@@ -84,7 +84,7 @@ jobs:
         shell: bash
 
       - name: List directory contents
-        run: ls -la dist/
+        run: ls -la test/
         shell: bash
 
       - name: Push package to Cloudsmith
