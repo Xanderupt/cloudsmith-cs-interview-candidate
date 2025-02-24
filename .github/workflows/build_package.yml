@@ -35,7 +35,7 @@ jobs:
         run: python -m build
 
       - name: Create directory
-        run: sudo mkdir test/
+        run: mkdir -p test/
         shell: bash
     
     
@@ -65,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: example-package
-          path: /home/runner/work/cloudsmith-cs-interview-candidate/cloudsmith-cs-interview-candidate/test/
+          path: test/
           if-no-files-found: error
           retention-days: 5
       - name: List directory contents
