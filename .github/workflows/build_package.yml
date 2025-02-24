@@ -40,19 +40,19 @@ jobs:
     
     
       - name: Create directory
-        run: pwd
+        run: ls -la
         shell: bash
     
       
-      - name: Print absolute path of dist directory
+      - name: Print absolute path of test directory
 
         run: |
 
-          if [ -d "dist" ]; then
+          if [ -d "test" ]; then
 
             echo "Absolute path of dist directory:"
 
-            realpath dist
+            realpath test
 
           else
 
