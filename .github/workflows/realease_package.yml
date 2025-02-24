@@ -36,7 +36,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install jq
         run: sudo apt-get install -y jq
@@ -84,7 +84,7 @@ jobs:
         shell: bash
 
       - name: List directory contents
-        run: ls -la /home/runner/work/cloudsmith-cs-interview-candidate/cloudsmith-cs-interview-candidate/
+        run: ls -la dist/
         shell: bash
 
       - name: Push package to Cloudsmith
