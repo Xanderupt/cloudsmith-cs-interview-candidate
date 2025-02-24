@@ -38,6 +38,23 @@ jobs:
         run: ls -la dist/
         shell: bash
       
+      - name: Print absolute path of dist directory
+
+        run: |
+
+          if [ -d "dist" ]; then
+
+            echo "Absolute path of dist directory:"
+
+            realpath dist
+
+          else
+
+            echo "dist directory does not exist."
+
+            exit 1
+
+          fi
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
