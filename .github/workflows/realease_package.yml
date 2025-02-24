@@ -14,7 +14,7 @@ env:
   CLOUDSMITH_SERVICE_SLUG: ${{ vars.CLOUDSMITH_SERVICE_SLUG }}
 
 permissions:
-  contents: read  # Removed unnecessary actions: read permission
+  contents: read
 
 jobs:
   publish:
@@ -41,5 +41,10 @@ jobs:
             echo "No package found to upload"
             exit 1
           fi
-          cloudsmith push python ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }} dist/*.tar.gz --republish
+          PACKAGE_FILE=$(ls dist/*.tar.gz)
+          cloudsmith push python ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }} $PACKAGE_FILE --republish
+          
+          # Tag the package with `ready-for-production`
+          PACKAGE_NAME=$(basename $PACKAGE_FILE)
+          cloudsmith tag add ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }} $PACKAGE_NAME ready-for-production
         shell: bash
