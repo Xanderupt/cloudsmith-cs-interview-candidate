@@ -1,8 +1,7 @@
 name: Promote Python Package
 
 on:
-  repository_dispatch:
-    types: [package_synchronized]
+  package_synchronized:
 
 env:
   CLOUDSMITH_NAMESPACE: ${{ secrets.CLOUDSMITH_NAMESPACE }}
@@ -66,7 +65,7 @@ jobs:
           echo "Authenticating Cloudsmith CLI..."
           export CLOUDSMITH_API_KEY
 
-      - name: Get package identifier and promote
+      - name: Tag package with ready-for-production
         run: |
           PACKAGE_QUERY="tag:ready-for-production"
           echo "Searching for packages with query: $PACKAGE_QUERY"
@@ -80,6 +79,13 @@ jobs:
             exit 1
           fi
           
+          for IDENTIFIER in $IDENTIFIERS; do
+            echo "Tagging package with identifier: $IDENTIFIER"
+            cloudsmith tags add ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER ready-for-production
+          done
+
+      - name: Promote package
+        run: |
           for IDENTIFIER in $IDENTIFIERS; do
             echo "Promoting package with identifier: $IDENTIFIER"
             cloudsmith mv --yes \
