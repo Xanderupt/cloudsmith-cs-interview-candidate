@@ -66,25 +66,31 @@ jobs:
           echo "Authenticating Cloudsmith CLI..."
           export CLOUDSMITH_API_KEY
 
-      - name: Tag package with ready-for-production
-        run: |
-          PACKAGE_QUERY="tag:ready-for-production"
-          echo "Searching for packages with query: $PACKAGE_QUERY"
+#      - name: Tag package with ready-for-production
+#        run: |
+#          PACKAGE_QUERY="tag:ready-for-production"
+#          echo "Searching for packages with query: $PACKAGE_QUERY"
           
-          PACKAGE_DATA=$(cloudsmith list package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} -q "$PACKAGE_QUERY" -F json)
+#          PACKAGE_DATA=$(cloudsmith list package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} -q "$PACKAGE_QUERY" -F json)
           
-          IDENTIFIERS=$(echo "$PACKAGE_DATA" | jq -r '.data[].identifier_perm')
+#          IDENTIFIERS=$(echo "$PACKAGE_DATA" | jq -r '.data[].identifier_perm')
           
-          if [ -z "$IDENTIFIERS" ]; then
-            echo "No packages found with the ready-for-production tag"
-            exit 1
-          fi
+#          if [ -z "$IDENTIFIERS" ]; then
+#            echo "No packages found with the ready-for-production tag"
+#            exit 1
+#          fi
           
-          for IDENTIFIER in $IDENTIFIERS; do
-            echo "Tagging package with identifier: $IDENTIFIER"
-            cloudsmith tags add ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER ready-for-production
-          done
+#          for IDENTIFIER in $IDENTIFIERS; do
+#            echo "Tagging package with identifier: $IDENTIFIER"
+#            cloudsmith tags add ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER ready-for-production
+#          done
 
+      - name: Tag packages with 'ready-for-production' (if not already tagged)
+        run: |
+          for IDENTIFIER in $PACKAGE_IDENTIFIERS; do
+            echo "Tagging package $IDENTIFIER with 'ready-for-production' tag"
+            cloudsmith package tag ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER --tags ready-for-production
+          done
       - name: Promote package
         run: |
           for IDENTIFIER in $IDENTIFIERS; do
