@@ -14,8 +14,7 @@ env:
   CLOUDSMITH_SERVICE_SLUG: ${{ vars.CLOUDSMITH_SERVICE_SLUG }}
 
 permissions:
-  contents: read
-  actions: read
+  contents: read  # Removed unnecessary actions: read permission
 
 jobs:
   publish:
@@ -31,8 +30,6 @@ jobs:
           repository: ${{ github.repository }}
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
-
-
 
       - name: List directory contents
         run: ls -la dist/
