@@ -46,6 +46,6 @@ jobs:
           if-no-files-found: error
           retention-days: 5
       - name: List directory contents
-        run: ls -la /dist
+        run: ls -la dist/
         shell: bash
      
