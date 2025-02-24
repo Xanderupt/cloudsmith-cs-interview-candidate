@@ -38,10 +38,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: python-package
-          path: /
+          path: /tmp
           if-no-files-found: error
           retention-days: 5
       - name: List directory contents
-        run: ls -la /
+        run: ls -la /tmp
         shell: bash
      
