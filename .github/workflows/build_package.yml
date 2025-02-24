@@ -37,11 +37,7 @@ jobs:
       - name: Create directory
         run: mkdir -p test/
         shell: bash
-    
-    
-      - name: Create directory
-        run: ls -la
-        shell: bash
+
     
       
       - name: Print absolute path of test directory
