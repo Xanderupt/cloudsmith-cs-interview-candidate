@@ -65,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: example-package
-          path: dist/
+          path: test/
           if-no-files-found: error
           retention-days: 5
       - name: List directory contents
