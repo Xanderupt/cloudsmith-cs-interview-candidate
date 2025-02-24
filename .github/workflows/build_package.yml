@@ -3,10 +3,10 @@ name: Build Python Package
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 permissions:
   contents: read
@@ -31,11 +31,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install build
 
-      - name: Build package #Added Step to do Pythoon Build
+      - name: Build package
         run: python -m build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: python-package
           path: dist/
