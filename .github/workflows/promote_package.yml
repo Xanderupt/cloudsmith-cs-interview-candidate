@@ -5,38 +5,53 @@ on:
     types: [package_synchronized]
 
 env:
-  CLOUDSMITH_NAMESPACE: ${{ secrets.CLOUDSMITH_NAMESPACE }}  # Corrected to use secrets
+  CLOUDSMITH_NAMESPACE: ${{ secrets.CLOUDSMITH_NAMESPACE }}
   CLOUDSMITH_STAGING_REPO: 'staging'
   CLOUDSMITH_PRODUCTION_REPO: 'production'
-  CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}  # Corrected to use secrets
+  CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
   PACKAGE_NAME: 'example_package'
 
 permissions:
   id-token: write
+  contents: read
 
 jobs:
   promote:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Install jq
-        run: sudo apt-get install -y jq  # Added step to install jq
+        run: sudo apt-get install -y jq
+
+      - name: Request OIDC Token
+        id: oidc-token
+        run: |
+          echo "Requesting OIDC token..."
+          OIDC_TOKEN=$(curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=api://AzureADTokenExchange" | jq -r '.value')
+          echo "::add-mask::$OIDC_TOKEN"
+          echo "::set-output name=oidc-token::$OIDC_TOKEN"
+
+      - name: Mask OIDC Token
+        run: echo "OIDC Token length: ${#OIDC_TOKEN}"
 
       - name: Install Cloudsmith CLI
-        uses: cloudsmith-io/cloudsmith-cli-action@v1.0.1
-        with:
-          oidc-namespace: ${{ env.CLOUDSMITH_NAMESPACE }}
-          oidc-service-slug: ${{ env.CLOUDSMITH_SERVICE_SLUG }}
+        run: |
+          pip install cloudsmith-cli
+
+      - name: Authenticate Cloudsmith CLI
+        run: |
+          cloudsmith login --api-key ${{ secrets.CLOUDSMITH_API_KEY }}
 
       - name: Get package identifier and promote
         run: |
-          # Query for packages tagged with ready-for-production
-          PACKAGE_QUERY="tag:ready-for-production"  # Updated PACKAGE_QUERY to use tag
+          PACKAGE_QUERY="tag:ready-for-production"
           echo "Searching for packages with query: $PACKAGE_QUERY"
           
           PACKAGE_DATA=$(cloudsmith list package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} -q "$PACKAGE_QUERY" -F json)
           
-          # Extract identifiers and promote each package
           IDENTIFIERS=$(echo "$PACKAGE_DATA" | jq -r '.data[].identifier_perm')
           
           if [ -z "$IDENTIFIERS" ]; then
