@@ -34,36 +34,14 @@ jobs:
       - name: Build package
         run: python -m build
 
-      - name: Create directory
-        run: mkdir -p test/
-        shell: bash
-
-    
-      
-      - name: Print absolute path of test directory
-
-        run: |
-
-          if [ -d "test" ]; then
-
-            echo "Absolute path of dist directory:"
-
-            realpath test
-
-          else
-
-            echo "dist directory does not exist."
-
-            exit 1
-
-          fi
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: example-package
-          path: test/
+          path: dist/
           if-no-files-found: error
           retention-days: 5
+
       - name: List directory contents
         run: ls -la dist/
         shell: bash
