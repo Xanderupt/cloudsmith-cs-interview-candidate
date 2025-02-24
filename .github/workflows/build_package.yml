@@ -16,8 +16,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      artifact_name: python-package
     
     steps:
       - name: Checkout code
@@ -33,7 +31,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install build
 
-      - name: Build package
+      - name: Build package #Added Step to do Pythoon Build
+        run: python -m build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
