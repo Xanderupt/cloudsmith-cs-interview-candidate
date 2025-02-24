@@ -10,6 +10,7 @@ env:
   CLOUDSMITH_PRODUCTION_REPO: 'production'
   CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
   PACKAGE_NAME: 'example_package'
+  CLOUDSMITH_ACCOUNT: 'your-cloudsmith-account'  # Replace with your Cloudsmith account
 
 permissions:
   id-token: write
@@ -34,22 +35,36 @@ jobs:
           echo "::add-mask::$OIDC_TOKEN"
           echo "::set-output name=oidc-token::$OIDC_TOKEN"
 
-      - name: Validate OIDC Token
+      - name: Request JWT Token from Cloudsmith
+        id: jwt-token
         run: |
-          OIDC_TOKEN=${{ steps.oidc-token.outputs.oidc-token }}
-          echo "Validating OIDC token..."
-          if [ -z "$OIDC_TOKEN" ]; then
-            echo "OIDC token is empty"
+          echo "Requesting JWT token from Cloudsmith..."
+          JWT_RESPONSE=$(curl -X POST "https://api.cloudsmith.io/openid/${{ env.CLOUDSMITH_ACCOUNT }}/" \
+            -H "Content-Type: application/json" \
+            -d '{"oidc_token": "${{ steps.oidc-token.outputs.oidc-token }}", "service_slug": "${{ env.CLOUDSMITH_SERVICE_SLUG }}"}')
+          JWT_TOKEN=$(echo "$JWT_RESPONSE" | jq -r '.token')
+          echo "::add-mask::$JWT_TOKEN"
+          echo "::set-output name=jwt-token::$JWT_TOKEN"
+
+      - name: Validate JWT Token
+        run: |
+          JWT_TOKEN=${{ steps.jwt-token.outputs.jwt-token }}
+          echo "Validating JWT token..."
+          if [ -z "$JWT_TOKEN" ]; then
+            echo "JWT token is empty"
             exit 1
           fi
-          echo "OIDC token is valid"
+          echo "JWT token is valid"
 
       - name: Install Cloudsmith CLI
-        uses: cloudsmith-io/cloudsmith-cli-action@v1.0.1
-        with:
-          oidc-namespace: ${{ env.CLOUDSMITH_NAMESPACE }}
-          oidc-service-slug: ${{ env.CLOUDSMITH_SERVICE_SLUG }}
-          oidc-token: ${{ steps.oidc-token.outputs.oidc-token }}
+        run: |
+          pip install cloudsmith-cli
+
+      - name: Authenticate Cloudsmith CLI
+        run: |
+          CLOUDSMITH_API_KEY=${{ steps.jwt-token.outputs.jwt-token }}
+          echo "Authenticating Cloudsmith CLI..."
+          export CLOUDSMITH_API_KEY
 
       - name: Get package identifier and promote
         run: |
