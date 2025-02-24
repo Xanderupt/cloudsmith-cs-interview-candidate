@@ -90,7 +90,8 @@ jobs:
           fi
           PACKAGE_FILE=$(ls dist/*.tar.gz)
           PACKAGE_NAME=$(basename $PACKAGE_FILE)
-          cloudsmith tag add ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }} $PACKAGE_NAME ready-for-production
+          PACKAGE_IDENTIFIER="${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }}/$PACKAGE_NAME"
+          cloudsmith tag add $PACKAGE_IDENTIFIER ready-for-production
 
       - name: Push package to Cloudsmith
         run: |
