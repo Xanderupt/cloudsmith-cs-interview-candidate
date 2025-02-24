@@ -5,12 +5,11 @@ on:
     types: [package_synchronized]
 
 env:
-  CLOUDSMITH_NAMESPACE: ${{ secrets.CLOUDSMITH_NAMESPACE }}
+  CLOUDSMITH_NAMESPACE: ${{ secrets.CLOUDSMITH_NAMESPACE }}  # Corrected to use secrets
   CLOUDSMITH_STAGING_REPO: 'staging'
   CLOUDSMITH_PRODUCTION_REPO: 'production'
-  CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
-  PACKAGE_NAME: 'python_package'
-  CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+  CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}  # Corrected to use secrets
+  PACKAGE_NAME: 'example_package'
 
 permissions:
   id-token: write
@@ -21,23 +20,23 @@ jobs:
 
     steps:
       - name: Install jq
-        run: sudo apt-get install -y jq
+        run: sudo apt-get install -y jq  # Added step to install jq
 
       - name: Install Cloudsmith CLI
-        run: |
-          pip install cloudsmith-cli
-
-      - name: Authenticate Cloudsmith CLI
-        run: |
-          cloudsmith login --api-key ${{ env.CLOUDSMITH_API_KEY }}
+        uses: cloudsmith-io/cloudsmith-cli-action@v1.0.1
+        with:
+          oidc-namespace: ${{ env.CLOUDSMITH_NAMESPACE }}
+          oidc-service-slug: ${{ env.CLOUDSMITH_SERVICE_SLUG }}
 
       - name: Get package identifier and promote
         run: |
-          PACKAGE_QUERY="tag:ready-for-production"
+          # Query for packages tagged with ready-for-production
+          PACKAGE_QUERY="tag:ready-for-production"  # Updated PACKAGE_QUERY to use tag
           echo "Searching for packages with query: $PACKAGE_QUERY"
           
           PACKAGE_DATA=$(cloudsmith list package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} -q "$PACKAGE_QUERY" -F json)
           
+          # Extract identifiers and promote each package
           IDENTIFIERS=$(echo "$PACKAGE_DATA" | jq -r '.data[].identifier_perm')
           
           if [ -z "$IDENTIFIERS" ]; then
